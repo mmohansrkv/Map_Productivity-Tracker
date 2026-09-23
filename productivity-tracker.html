@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Productivity Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F4F1; --surface:#FFFFFF; --ink:#1B2320; --ink-soft:#5B655F;
+  --accent:#3A6B5C; --accent-dark:#28483D; --gold:#B8932C; --danger:#B23A48;
+  --border:#DCDBD3; --border-soft:#E9E8E2;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15181A; --surface:#1E2225; --ink:#EDEFEC; --ink-soft:#A3AAA5;
+    --accent:#6FAE97; --accent-dark:#8FC4B0; --gold:#D9B65B; --danger:#E17685;
+    --border:#33383A; --border-soft:#282C2E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15181A; --surface:#1E2225; --ink:#EDEFEC; --ink-soft:#A3AAA5;
+  --accent:#6FAE97; --accent-dark:#8FC4B0; --gold:#D9B65B; --danger:#E17685;
+  --border:#33383A; --border-soft:#282C2E;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Public Sans',system-ui,sans-serif;min-height:100%;}
+a{color:inherit;}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px;}
+h1,h2,h3{font-weight:700;letter-spacing:-0.01em;margin:0 0 4px;}
+p{color:var(--ink-soft);margin:4px 0 0;}
+.center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;}
+.login-card{width:100%;max-width:380px;}
+.brand{font-size:15px;font-weight:700;color:var(--accent-dark);letter-spacing:0.02em;margin-bottom:18px;}
+.field{margin-top:16px;}
+.field label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:6px;}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--ink);font-size:14px;font-family:inherit;}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:7px;border:1px solid transparent;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-primary{background:var(--accent-dark);color:#fff;}
+.btn-primary:hover{background:var(--accent);}
+.btn-ghost{background:transparent;border-color:var(--border);color:var(--ink);}
+.btn-ghost:hover{border-color:var(--accent);}
+.btn-danger{background:transparent;border-color:var(--danger);color:var(--danger);}
+.btn-danger:hover{background:var(--danger);color:#fff;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-block{width:100%;justify-content:center;margin-top:20px;}
+.err{color:var(--danger);font-size:13px;margin-top:10px;min-height:16px;}
+.home-links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:24px;}
+.home-links a{text-decoration:none;}
+.tile{display:block;width:200px;padding:24px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-align:center;transition:border-color .15s;}
+.tile:hover{border-color:var(--accent);}
+.tile .n{font-size:26px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:22px;flex-wrap:wrap;gap:10px;}
+.who{font-size:13px;color:var(--ink-soft);}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.tab{padding:8px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-soft);}
+.tab.active{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;color:var(--ink-soft);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:9px 10px;border-bottom:1px solid var(--border-soft);vertical-align:top;}
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:26px 0 10px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media (max-width:680px){.grid2,.grid4{grid-template-columns:1fr;}}
+.formcard{margin-bottom:18px;}
+.row-line{display:flex;gap:10px;align-items:flex-end;margin-top:10px;flex-wrap:wrap;}
+.row-line > div{flex:1;min-width:120px;}
+.row-line .rm{flex:0 0 auto;}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;background:var(--border-soft);color:var(--ink-soft);}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+@media (max-width:680px){.metrics{grid-template-columns:1fr 1fr;}}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.metric .v{font-size:22px;font-weight:800;}
+.metric .l{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.bar{height:8px;border-radius:6px;background:var(--border-soft);overflow:hidden;display:flex;margin-top:6px;}
+.bar span{display:block;height:100%;}
+.actions{display:flex;gap:6px;flex-wrap:wrap;}
+.hint{font-size:12px;color:var(--ink-soft);margin-top:14px;}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0;}
+.empty{padding:26px;text-align:center;color:var(--ink-soft);font-size:13px;}
+.linkbtn{background:none;border:none;color:var(--accent-dark);font-weight:600;cursor:pointer;font-size:13px;padding:0;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ---------- storage ---------- */
+const DB = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+function seed(){
+  if(!DB.get('pt_admins')) DB.set('pt_admins', [{username:'admin', password:'admin123'}]);
+  if(!DB.get('pt_employees')) DB.set('pt_employees', []);
+  if(!DB.get('pt_processes')) DB.set('pt_processes', []);
+  if(!DB.get('pt_logs')) DB.set('pt_logs', []);
+}
+seed();
+const S = { adminUser:null, empUser:null, tab:'employees', editEmp:null, editProc:null, editLog:null, procRows:[{process:'',hour:'',count:''}], noteRows:[{desc:'',hour:''}] };
+
+/* restore session + any unsaved draft entry, so a page refresh never logs the user out or loses work */
+(function restoreSession(){
+  const au = DB.get('pt_session_admin', null);
+  if(au && DB.get('pt_admins',[]).some(a=>a.username===au)) S.adminUser = au;
+  const euId = DB.get('pt_session_emp', null);
+  if(euId){
+    const emp = DB.get('pt_employees',[]).find(e=>e.id===euId);
+    if(emp) S.empUser = emp;
+  }
+  const draft = DB.get('pt_draft', null);
+  if(draft && S.empUser && draft.empId===S.empUser.id){
+    S.procRows = draft.procRows && draft.procRows.length ? draft.procRows : S.procRows;
+    S.noteRows = draft.noteRows && draft.noteRows.length ? draft.noteRows : S.noteRows;
+    S._editingLogId = draft.editingLogId || null;
+  }
+})();
+function saveDraft(){
+  if(!S.empUser) return;
+  DB.set('pt_draft', {empId:S.empUser.id, procRows:S.procRows, noteRows:S.noteRows, editingLogId:S._editingLogId||null});
+}
+function clearDraft(){ DB.set('pt_draft', null); }
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- router ---------- */
+window.addEventListener('hashchange', render);
+window.addEventListener('DOMContentLoaded', render);
+
+function nav(h){ location.hash = h; }
+
+function render(){
+  const h = location.hash.replace('#','') || 'home';
+  const app = document.getElementById('app');
+  if(h==='home') app.innerHTML = viewHome();
+  else if(h==='admin-login') app.innerHTML = viewAdminLogin();
+  else if(h==='admin') { if(!S.adminUser){ nav('admin-login'); return;} app.innerHTML = viewAdmin(); }
+  else if(h==='emp-login') app.innerHTML = viewEmpLogin();
+  else if(h==='emp') { if(!S.empUser){ nav('emp-login'); return;} app.innerHTML = viewEmp(); }
+  else app.innerHTML = viewHome();
+}
+
+/* ---------- HOME ---------- */
+function viewHome(){
+  return `<div class="center"><div style="text-align:center">
+    <div class="brand">PRODUCTIVITY TRACKER</div>
+    <h1 style="font-size:28px">Log the work. See the day clearly.</h1>
+    <p>Choose how you're signing in.</p>
+    <div class="home-links">
+      <a href="#admin-login"><div class="tile"><div class="n">🛠️</div><h3 style="margin-top:8px">Admin login</h3><p>Manage employees, processes &amp; all logs</p></div></a>
+      <a href="#emp-login"><div class="tile"><div class="n">📋</div><h3 style="margin-top:8px">Employee login</h3><p>Submit and review your daily entries</p></div></a>
+    </div>
+  </div></div>`;
+}
+
+/* ---------- ADMIN LOGIN ---------- */
+function viewAdminLogin(){
+  return `<div class="center"><div class="card login-card">
+    <div class="brand">ADMIN LOGIN</div>
+    <h2>Sign in</h2><p>Manage employees, processes and productivity logs.</p>
+    <div class="field"><label>Username</label><input id="au" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="ap" type="password" autocomplete="current-password"></div>
+    <div class="err" id="aerr"></div>
+    <button class="btn btn-primary btn-block" onclick="doAdminLogin()">Sign in</button>
+    <p class="hint" style="text-align:center">Default: admin / admin123 &nbsp;·&nbsp; <a href="#home">Back home</a></p>
+  </div></div>`;
+}
+function doAdminLogin(){
+  const u=document.getElementById('au').value.trim(), p=document.getElementById('ap').value;
+  const found = DB.get('pt_admins',[]).find(a=>a.username===u && a.password===p);
+  if(found){ S.adminUser=u; DB.set('pt_session_admin', u); nav('admin'); } else document.getElementById('aerr').textContent='Incorrect username or password.';
+}
+
+/* ---------- EMPLOYEE LOGIN ---------- */
+function viewEmpLogin(){
+  return `<div class="center"><div class="card login-card">
+    <div class="brand">EMPLOYEE LOGIN</div>
+    <h2>Sign in</h2><p>Use the username and password your admin gave you.</p>
+    <div class="field"><label>Username</label><input id="eu" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="ep" type="password" autocomplete="current-password"></div>
+    <div class="err" id="eerr"></div>
+    <button class="btn btn-primary btn-block" onclick="doEmpLogin()">Sign in</button>
+    <p class="hint" style="text-align:center"><a href="#home">Back home</a></p>
+  </div></div>`;
+}
+function doEmpLogin(){
+  const u=document.getElementById('eu').value.trim(), p=document.getElementById('ep').value;
+  const found = DB.get('pt_employees',[]).find(e=>e.email===u && e.password===p);
+  if(found){ S.empUser=found; DB.set('pt_session_emp', found.id);
+    const draft = DB.get('pt_draft', null);
+    if(draft && draft.empId===found.id){ S.procRows=draft.procRows&&draft.procRows.length?draft.procRows:[{process:'',hour:'',count:''}]; S.noteRows=draft.noteRows&&draft.noteRows.length?draft.noteRows:[{desc:'',hour:''}]; S._editingLogId=draft.editingLogId||null; }
+    else { S.procRows=[{process:'',hour:'',count:''}]; S.noteRows=[{desc:'',hour:''}]; }
+    nav('emp'); }
+  else document.getElementById('eerr').textContent='Incorrect username or password, or no account set up yet — ask your admin.';
+}
+
+/* ---------- ADMIN DASHBOARD ---------- */
+function viewAdmin(){
+  return `<div class="wrap">
+    <div class="topbar">
+      <div><h1>Admin</h1><p>Employees, processes and productivity logs</p></div>
+      <div class="who">Signed in as <strong>${esc(S.adminUser)}</strong> &nbsp;·&nbsp; <button class="linkbtn" onclick="S.adminUser=null;DB.set('pt_session_admin',null);nav('home')">Log out</button></div>
+    </div>
+    <div class="tabs">
+      <div class="tab ${S.tab==='employees'?'active':''}" onclick="S.tab='employees';render()">Employees</div>
+      <div class="tab ${S.tab==='processes'?'active':''}" onclick="S.tab='processes';render()">Processes</div>
+      <div class="tab ${S.tab==='logs'?'active':''}" onclick="S.tab='logs';render()">Productivity log</div>
+      <div class="tab ${S.tab==='sync'?'active':''}" onclick="S.tab='sync';render()">Sync</div>
+    </div>
+    ${S.tab==='employees'?adminEmployees():S.tab==='processes'?adminProcesses():S.tab==='logs'?adminLogs():adminSync()}
+  </div>`;
+}
+
+function adminEmployees(){
+  const list = DB.get('pt_employees',[]);
+  const ed = S.editEmp;
+  return `<div class="card formcard">
+    <h3>${ed?'Edit employee':'Add employee'}</h3>
+    <div class="grid4">
+      <div class="field"><label>Employee ID</label><input id="f_id" value="${esc(ed?ed.id:'')}" ${ed?'readonly':''}></div>
+      <div class="field"><label>Name</label><input id="f_name" value="${esc(ed?ed.name:'')}"></div>
+      <div class="field"><label>Band</label><input id="f_band" value="${esc(ed?ed.band:'')}"></div>
+      <div class="field"><label>Email / username</label><input id="f_email" value="${esc(ed?ed.email:'')}"></div>
+    </div>
+    <div class="grid4">
+      <div class="field"><label>Password</label><input id="f_pass" value="${esc(ed?ed.password:'')}"></div>
+    </div>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="saveEmployee()">${ed?'Save changes':'Add employee'}</button>
+      ${ed?'<button class="btn btn-ghost" onclick="S.editEmp=null;render()">Cancel</button>':''}
+    </div>
+    <div class="err" id="emperr"></div>
+  </div>
+  <div class="tablewrap">
+    <table><thead><tr><th>Employee ID</th><th>Name</th><th>Band</th><th>Email</th><th>Password</th><th></th></tr></thead>
+    <tbody>${list.length?list.map(e=>`<tr>
+      <td>${esc(e.id)}</td><td>${esc(e.name)}</td><td><span class="pill">${esc(e.band)}</span></td><td>${esc(e.email)}</td><td>${esc(e.password)}</td>
+      <td class="actions"><button class="btn btn-ghost btn-sm" onclick="editEmployee('${e.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">Delete</button></td>
+    </tr>`).join(''):'<tr><td colspan="6" class="empty">No employees yet. Add one above.</td></tr>'}</tbody></table>
+  </div>`;
+}
+function editEmployee(id){ S.editEmp = DB.get('pt_employees',[]).find(e=>e.id===id); render(); }
+function deleteEmployee(id){ if(!confirm('Delete this employee?')) return; DB.set('pt_employees', DB.get('pt_employees',[]).filter(e=>e.id!==id)); render(); }
+function saveEmployee(){
+  const id=document.getElementById('f_id').value.trim(), name=document.getElementById('f_name').value.trim(),
+        band=document.getElementById('f_band').value.trim(), email=document.getElementById('f_email').value.trim(),
+        pass=document.getElementById('f_pass').value.trim();
+  if(!id||!name||!email||!pass){ document.getElementById('emperr').textContent='Fill in ID, name, email and password.'; return; }
+  let list = DB.get('pt_employees',[]);
+  if(S.editEmp){ list = list.map(e=>e.id===S.editEmp.id?{id,name,band,email,password:pass}:e); }
+  else{ if(list.some(e=>e.id===id)){ document.getElementById('emperr').textContent='That Employee ID already exists.'; return; } list.push({id,name,band,email,password:pass}); }
+  DB.set('pt_employees', list); S.editEmp=null; syncToSheet({type:'employees', rows:list}); render();
+}
+
+function adminProcesses(){
+  const list = DB.get('pt_processes',[]);
+  const ed = S.editProc;
+  return `<div class="card formcard">
+    <h3>${ed?'Edit process':'Add process'}</h3>
+    <div class="grid4">
+      <div class="field"><label>Process name</label><input id="p_name" value="${esc(ed?ed.name:'')}" ${ed?'readonly':''}></div>
+      <div class="field"><label>Target hours</label><input id="p_hours" type="number" step="0.1" value="${ed?ed.targetHours:''}"></div>
+      <div class="field"><label>Target 100%</label><input id="p_t100" value="${esc(ed?ed.target100:'')}"></div>
+      <div class="field"><label>Target count / hour</label><input id="p_cph" type="number" step="0.1" value="${ed?ed.targetCountPerHour:''}"></div>
+    </div>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="saveProcess()">${ed?'Save changes':'Add process'}</button>
+      ${ed?'<button class="btn btn-ghost" onclick="S.editProc=null;render()">Cancel</button>':''}
+    </div>
+    <div class="err" id="procerr"></div>
+  </div>
+  <div class="tablewrap">
+    <table><thead><tr><th>Process name</th><th>Target hours</th><th>Target 100%</th><th>Target count/hr</th><th></th></tr></thead>
+    <tbody>${list.length?list.map(p=>`<tr>
+      <td>${esc(p.name)}</td><td>${esc(p.targetHours)}</td><td>${esc(p.target100)}</td><td>${esc(p.targetCountPerHour)}</td>
+      <td class="actions"><button class="btn btn-ghost btn-sm" onclick="editProcess('${esc(p.name)}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteProcess('${esc(p.name)}')">Delete</button></td>
+    </tr>`).join(''):'<tr><td colspan="5" class="empty">No processes yet. Add one above.</td></tr>'}</tbody></table>
+  </div>`;
+}
+function editProcess(name){ S.editProc = DB.get('pt_processes',[]).find(p=>p.name===name); render(); }
+function deleteProcess(name){ if(!confirm('Delete this process?')) return; DB.set('pt_processes', DB.get('pt_processes',[]).filter(p=>p.name!==name)); render(); }
+function saveProcess(){
+  const name=document.getElementById('p_name').value.trim(), targetHours=document.getElementById('p_hours').value,
+        target100=document.getElementById('p_t100').value.trim(), targetCountPerHour=document.getElementById('p_cph').value;
+  if(!name){ document.getElementById('procerr').textContent='Process name is required.'; return; }
+  let list = DB.get('pt_processes',[]);
+  if(S.editProc){ list = list.map(p=>p.name===S.editProc.name?{name,targetHours,target100,targetCountPerHour}:p); }
+  else{ if(list.some(p=>p.name===name)){ document.getElementById('procerr').textContent='That process already exists.'; return; } list.push({name,targetHours,target100,targetCountPerHour}); }
+  DB.set('pt_processes', list); S.editProc=null; syncToSheet({type:'processes', rows:list}); render();
+}
+
+function adminLogs(){
+  const logs = DB.get('pt_logs',[]).slice().sort((a,b)=>b.date.localeCompare(a.date)||b.submittedAt-a.submittedAt);
+  return `<div class="tablewrap">
+    <table><thead><tr><th>Date</th><th>Employee</th><th>Band</th><th>Productive hrs</th><th>Non-prod hrs</th><th>Total</th><th></th></tr></thead>
+    <tbody>${logs.length?logs.map(l=>{const t=logTotals(l);return `<tr>
+      <td>${esc(l.date)}</td><td>${esc(l.employeeName)} <span class="pill">${esc(l.employeeId)}</span></td><td>${esc(l.band)}</td>
+      <td>${t.prod.toFixed(2)}</td><td>${t.nonProd.toFixed(2)}</td><td>${t.total.toFixed(2)}</td>
+      <td class="actions"><button class="btn btn-ghost btn-sm" onclick="viewLog('${l.id}')">View</button><button class="btn btn-danger btn-sm" onclick="adminDeleteLog('${l.id}')">Delete</button></td>
+    </tr>`}).join(''):'<tr><td colspan="7" class="empty">No productivity entries submitted yet.</td></tr>'}</tbody></table>
+  </div>
+  ${S.editLog?logDetailModal(S.editLog,true):''}`;
+}
+function viewLog(id){ S.editLog = DB.get('pt_logs',[]).find(l=>l.id===id); render(); }
+function adminDeleteLog(id){ if(!confirm('Delete this entry?')) return; DB.set('pt_logs', DB.get('pt_logs',[]).filter(l=>l.id!==id)); S.editLog=null; render(); }
+function logDetailModal(l, isAdmin){
+  const t = logTotals(l);
+  return `<div class="card" style="margin-top:16px">
+    <div class="section-title"><h3>${esc(l.employeeName)} — ${esc(l.date)}</h3><button class="linkbtn" onclick="S.editLog=null;render()">Close</button></div>
+    <p>Band ${esc(l.band)} · Employee ID ${esc(l.employeeId)}</p>
+    <h3 style="margin-top:18px;font-size:14px">Process entries</h3>
+    <div class="tablewrap" style="margin-top:6px"><table><thead><tr><th>Process</th><th>Hours</th><th>Count</th></tr></thead>
+    <tbody>${l.processes.map(p=>`<tr><td>${esc(p.process)}</td><td>${p.hour}</td><td>${p.count}</td></tr>`).join('')||'<tr><td colspan="3" class="empty">None</td></tr>'}</tbody></table></div>
+    <h3 style="margin-top:18px;font-size:14px">Notes</h3>
+    <div class="tablewrap" style="margin-top:6px"><table><thead><tr><th>Description</th><th>Hours</th></tr></thead>
+    <tbody>${l.notes.map(n=>`<tr><td>${esc(n.desc)}</td><td>${n.hour}</td></tr>`).join('')||'<tr><td colspan="2" class="empty">None</td></tr>'}</tbody></table></div>
+    <div class="metrics">
+      <div class="metric"><div class="v">${t.prod.toFixed(2)}</div><div class="l">Productive hrs</div></div>
+      <div class="metric"><div class="v">${t.nonProd.toFixed(2)}</div><div class="l">Non-productive hrs</div></div>
+      <div class="metric"><div class="v">${t.total.toFixed(2)} / 8</div><div class="l">Total logged</div></div>
+      <div class="metric"><div class="v">${t.remaining.toFixed(2)}</div><div class="l">${t.remaining>=0?'Remaining to 8h':'Over 8h'}</div></div>
+    </div>
+  </div>`;
+}
+
+function adminSync(){
+  const url = DB.get('pt_webhook','');
+  return `<div class="card">
+    <h3>Google Sheet sync</h3>
+    <p>Paste the Web app URL from the SheetSync-AppsScript.gs deployment (see the file Claude gave you). Once set, employee saves and admin edits push straight to your sheet.</p>
+    <div class="field"><label>Web app URL</label><input id="webhookUrl" value="${esc(url)}" placeholder="https://script.google.com/macros/s/…/exec"></div>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn btn-primary" onclick="saveWebhook()">Save URL</button>
+      <button class="btn btn-ghost" onclick="pushAllToSheet()">Push all data now</button>
+    </div>
+    <div class="err" id="syncMsg" style="color:var(--accent-dark)"></div>
+    <p class="hint">Note: this only works when the tracker is opened directly (its own hosted page or the downloaded HTML file) — the claude.ai preview link sandboxes outbound requests, so sync won't fire there.</p>
+    <hr class="divider">
+    <h3>Export data (JSON)</h3>
+    <p>Downloads everything in this browser — employees, processes and every productivity log — as one JSON file, as a manual backup independent of the sheet sync.</p>
+    <div class="actions" style="margin-top:14px"><button class="btn btn-ghost" onclick="exportDataJson()">Download backup (JSON)</button></div>
+  </div>`;
+}
+function exportDataJson(){
+  const data = { exportedAt:new Date().toISOString(), employees:DB.get('pt_employees',[]), processes:DB.get('pt_processes',[]), logs:DB.get('pt_logs',[]) };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'productivity-tracker-backup-'+todayStr()+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function saveWebhook(){ DB.set('pt_webhook', document.getElementById('webhookUrl').value.trim()); document.getElementById('syncMsg').textContent='Saved.'; }
+async function syncToSheet(payload){
+  const url = DB.get('pt_webhook','');
+  if(!url) return {ok:false, reason:'no-url'};
+  try{
+    // Apps Script web apps don't send CORS headers a cross-origin page can read,
+    // so we fire in no-cors mode: the request still reaches Google, we just can't read the response.
+    await fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload)});
+    return {ok:true, sent:true};
+  }catch(e){
+    return {ok:false, reason: (e && e.message) ? e.message : 'network-blocked'};
+  }
+}
+async function pushAllToSheet(){
+  const msg = document.getElementById('syncMsg'); msg.textContent='Pushing…'; msg.style.color='var(--accent-dark)';
+  const url = DB.get('pt_webhook','');
+  if(!url){ msg.textContent='Set and save a Web app URL first.'; msg.style.color='var(--danger)'; return; }
+  const r1 = await syncToSheet({type:'employees', rows: DB.get('pt_employees',[])});
+  const r2 = await syncToSheet({type:'processes', rows: DB.get('pt_processes',[])});
+  const logs = DB.get('pt_logs',[]);
+  let logOk=0, logFail=0, lastErr='';
+  for(const l of logs){ const r = await syncToSheet({type:'log', row:l}); if(r.ok) logOk++; else { logFail++; lastErr=r.reason; } }
+  if(r1.ok && r2.ok && logFail===0){
+    msg.style.color='var(--accent-dark)';
+    msg.textContent='Request sent for employees, processes and '+logs.length+' log entries. Open your sheet to confirm the rows landed — the browser can\'t confirm Google\'s side for this kind of request.';
+  } else {
+    msg.style.color='var(--danger)';
+    msg.textContent='Sync failed to reach Google ('+(lastErr||r1.reason||r2.reason||'blocked')+'). This link is likely the claude.ai preview, which blocks outbound requests — open the downloaded HTML file or your own hosted copy instead.';
+  }
+}
+function logTotals(l){
+  const prod = l.processes.reduce((s,p)=>s+(parseFloat(p.hour)||0),0);
+  const nonProd = l.notes.reduce((s,n)=>s+(parseFloat(n.hour)||0),0);
+  const total = prod+nonProd;
+  return {prod, nonProd, total, remaining: 8-total};
+}
+function viewEmp(){
+  const emp = S.empUser;
+  const processOptions = DB.get('pt_processes',[]).map(p=>p.name);
+  const myLogsToday = DB.get('pt_logs',[]).filter(l=>l.employeeId===emp.id && l.date===todayStr());
+  return `<div class="wrap">
+    <div class="topbar">
+      <div><h1>${esc(emp.name)}</h1><p>Employee ID ${esc(emp.id)} · Band ${esc(emp.band)}</p></div>
+      <div class="who"><button class="linkbtn" onclick="S.empUser=null;DB.set('pt_session_emp',null);nav('home')">Log out</button></div>
+    </div>
+
+    <div class="card">
+      <h3>Daily productivity entry</h3>
+      <div class="grid4">
+        <div class="field"><label>Date</label><input id="d_date" type="date" value="${todayStr()}"></div>
+        <div class="field"><label>Band</label><input value="${esc(emp.band)}" readonly></div>
+        <div class="field"><label>Employee ID</label><input value="${esc(emp.id)}" readonly></div>
+        <div class="field"><label>Employee name</label><input value="${esc(emp.name)}" readonly></div>
+      </div>
+
+      <h3 style="margin-top:24px;font-size:14px">Process entries</h3>
+      <div id="procRows">${S.procRows.map((r,i)=>`<div class="row-line">
+        <div><label style="font-size:12px;color:var(--ink-soft)">Process name</label><select onchange="S.procRows[${i}].process=this.value;saveDraft();">
+          <option value="">Select…</option>${processOptions.map(o=>`<option ${r.process===o?'selected':''}>${esc(o)}</option>`).join('')}
+        </select></div>
+        <div><label style="font-size:12px;color:var(--ink-soft)">Hours</label><input type="number" step="0.1" value="${esc(r.hour)}" oninput="S.procRows[${i}].hour=this.value;saveDraft();"></div>
+        <div><label style="font-size:12px;color:var(--ink-soft)">Count</label><input type="number" step="1" value="${esc(r.count)}" oninput="S.procRows[${i}].count=this.value;saveDraft();"></div>
+        <div class="rm"><button class="btn btn-ghost btn-sm" onclick="removeProcRow(${i})">Remove</button></div>
+      </div>`).join('')}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addProcRow()">+ Add process</button>
+
+      <h3 style="margin-top:24px;font-size:14px">Notes</h3>
+      <div id="noteRows">${S.noteRows.map((r,i)=>`<div class="row-line">
+        <div style="flex:3"><label style="font-size:12px;color:var(--ink-soft)">Description</label><input value="${esc(r.desc)}" oninput="S.noteRows[${i}].desc=this.value;saveDraft();"></div>
+        <div><label style="font-size:12px;color:var(--ink-soft)">Hours</label><input type="number" step="0.1" value="${esc(r.hour)}" oninput="S.noteRows[${i}].hour=this.value;saveDraft();"></div>
+        <div class="rm"><button class="btn btn-ghost btn-sm" onclick="removeNoteRow(${i})">Remove</button></div>
+      </div>`).join('')}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addNoteRow()">+ Add note</button>
+
+      ${empLivePreview()}
+      <div class="err" id="empErr"></div>
+      <button class="btn btn-primary btn-block" onclick="saveEmpLog()">Save entry</button>
+    </div>
+
+    <div class="section-title"><h3>Submitted today</h3></div>
+    <div class="tablewrap">
+      <table><thead><tr><th>Date</th><th>Processes</th><th>Prod hrs</th><th>Non-prod hrs</th><th>Total</th><th></th></tr></thead>
+      <tbody>${myLogsToday.length?myLogsToday.map(l=>{const t=logTotals(l);return `<tr>
+        <td>${esc(l.date)}</td><td>${l.processes.map(p=>esc(p.process)).filter(Boolean).join(', ')||'—'}</td>
+        <td>${t.prod.toFixed(2)}</td><td>${t.nonProd.toFixed(2)}</td><td>${t.total.toFixed(2)}</td>
+        <td class="actions"><button class="btn btn-ghost btn-sm" onclick="viewLog('${l.id}')">View</button><button class="btn btn-ghost btn-sm" onclick="loadLogForEdit('${l.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="empDeleteLog('${l.id}')">Delete</button></td>
+      </tr>`}).join(''):'<tr><td colspan="6" class="empty">Nothing submitted today yet.</td></tr>'}</tbody></table>
+    </div>
+    ${S.editLog?logDetailModal(S.editLog,false):''}
+
+    <div class="hint">Data is stored in this browser only. Ask your admin to set up Google Sheet sync (Admin → Sync tab), or use Admin → Sync → Export data (JSON) for a manual backup.</div>
+  </div>`;
+}
+function empLivePreview(){
+  const prod = S.procRows.reduce((s,r)=>s+(parseFloat(r.hour)||0),0);
+  const nonProd = S.noteRows.reduce((s,r)=>s+(parseFloat(r.hour)||0),0);
+  const total = prod+nonProd, remaining = 8-total;
+  const prodPct = Math.min(100, (prod/8)*100), nonProdPct = Math.min(100-prodPct,(nonProd/8)*100);
+  return `<div class="metrics">
+    <div class="metric"><div class="v">${prod.toFixed(2)}</div><div class="l">Productive hrs</div></div>
+    <div class="metric"><div class="v">${nonProd.toFixed(2)}</div><div class="l">Non-productive hrs</div></div>
+    <div class="metric"><div class="v">${total.toFixed(2)} / 8</div><div class="l">Total logged today</div>
+      <div class="bar"><span style="width:${prodPct}%;background:var(--accent)"></span><span style="width:${nonProdPct}%;background:var(--gold)"></span></div>
+    </div>
+    <div class="metric"><div class="v" style="color:${remaining<0?'var(--danger)':'inherit'}">${remaining.toFixed(2)}</div><div class="l">${remaining>=0?'Remaining to 8h':'Over 8h target'}</div></div>
+  </div>`;
+}
+function addProcRow(){ S.procRows.push({process:'',hour:'',count:''}); saveDraft(); render(); }
+function removeProcRow(i){ S.procRows.splice(i,1); if(!S.procRows.length) S.procRows=[{process:'',hour:'',count:''}]; saveDraft(); render(); }
+function addNoteRow(){ S.noteRows.push({desc:'',hour:''}); saveDraft(); render(); }
+function removeNoteRow(i){ S.noteRows.splice(i,1); if(!S.noteRows.length) S.noteRows=[{desc:'',hour:''}]; saveDraft(); render(); }
+
+function saveEmpLog(){
+  const date = document.getElementById('d_date').value || todayStr();
+  const processes = S.procRows.filter(r=>r.process||r.hour||r.count);
+  const notes = S.noteRows.filter(r=>r.desc||r.hour);
+  if(!processes.length && !notes.length){ document.getElementById('empErr').textContent='Add at least one process entry or note.'; return; }
+  const emp = S.empUser;
+  let list = DB.get('pt_logs',[]);
+  let savedEntry;
+  if(S._editingLogId){
+    list = list.map(l=>l.id===S._editingLogId?(savedEntry={...l,date,processes,notes}):l);
+    S._editingLogId=null;
+  } else {
+    savedEntry = {id:uid(), date, band:emp.band, employeeId:emp.id, employeeName:emp.name, processes, notes, submittedAt:Date.now()};
+    list.push(savedEntry);
+  }
+  DB.set('pt_logs', list);
+  syncToSheet({type:'log', row:savedEntry});
+  S.procRows=[{process:'',hour:'',count:''}]; S.noteRows=[{desc:'',hour:''}];
+  clearDraft();
+  render();
+}
+function loadLogForEdit(id){
+  const l = DB.get('pt_logs',[]).find(x=>x.id===id);
+  S.procRows = l.processes.length? l.processes.map(p=>({...p})) : [{process:'',hour:'',count:''}];
+  S.noteRows = l.notes.length? l.notes.map(n=>({...n})) : [{desc:'',hour:''}];
+  S._editingLogId = id;
+  saveDraft();
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function empDeleteLog(id){ if(!confirm('Delete this entry?')) return; DB.set('pt_logs', DB.get('pt_logs',[]).filter(l=>l.id!==id)); render(); }
+</script>
+</body>
+</html>
